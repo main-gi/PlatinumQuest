@@ -110,6 +110,13 @@ function clientCmdCbOnRespawn() {
 
 	deleteVariables("$Client::UsedPowerup*");
 
+	for (%i = 0; %i < PlayGui.powerupTimersLength; %i ++) { // main_gi: Cancel all the schedules.
+		cancel(PlayGui.powerupTimersSchedules[%i]);
+	}
+	PlayGui.powerupTimersLength = 0; // main_gi: I'M TAGGING THIS WITH MY NAME BECAUSE I'LL FORGET I WROTE THIS LINE IF I DON'T!
+	PlayGui.powerupTimersTrueLength = 0;
+
+
 	clientResetTriggerEntry();
 	Gravity::clearTriggers();
 	Physics::popAllLayers();
@@ -132,6 +139,12 @@ function clientCmdCbOnRespawnOnCheckpoint() {
 	$Game::BubbleActive = 0;
 	Physics::popLayerName("Bubble");
 
+	for (%i = 0; %i < PlayGui.powerupTimersLength; %i ++) { // main_gi: Cancel all the schedules.
+		cancel(PlayGui.powerupTimersSchedules[%i]);
+	}
+	PlayGui.powerupTimersLength = 0; // main_gi: I'M TAGGING THIS WITH MY NAME BECAUSE I'LL FORGET I WROTE THIS LINE IF I DON'T!
+	PlayGui.powerupTimersTrueLength = 0;
+	
 	clientResetTriggerEntry();
 	Gravity::clearTriggers();
 	$Client::Frozen = false;

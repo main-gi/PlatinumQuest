@@ -188,14 +188,21 @@ function clientCmdDoPowerUp(%powerUpId) {
 function clientCmdActivatePowerUp(%powerUpId) {
 	$Client::UsedPowerup[%powerUpId] = true;
 	$Game::PowerupActive[%powerUpId] = true;
-	$Game::PowerupStart[%powerUpId] = $Sim::Time;
+	//$Game::PowerupStart[%powerUpId] = $Sim::Time;
+	$Game::PowerupStart[%powerUpId] = getSimTime(); // This PowerupStart thing seems to get referenced in NOTHING, but $Sim::Time; doesn't work at all, it just seems to be 0.
+
+	if (%powerupId != 1 && %powerupId != 2 && %powerupId != 9) { // Super Jump / Super Speed are instant. Mega is 10s, Teleporter is 2s.
+		// 9 is the special ID for the Cave Story pq level that uses a modded SJ, White Noise or whatever.
+		PlayGui.pushPowerupTimer(%powerupId, getSimTime(), (%powerupId == 6? 10000 : (%powerupId==7? 2000:5000)));
+	}
+
 	//if (%powerUpId == 6)
 	//MegaRollingHardSfx.filename = RollingHardSfx.filename = "~/data/sound/mega_roll.wav";
 }
 function clientCmdDeactivatePowerUp(%powerUpId) {
 	$Game::PowerupActive[%powerUpId] = false;
 	//if (%powerUpId == 6)
-	//MegaRollingHardSfx.filename = RollingHardSfx.filename = "~/data/sound/Rolling_Hard.wav";
+	//MegaRollingHardSfx.filename = RollingHardSfx.filename = "~/data/sound/rolling_hard.wav";
 }
 
 function clientCmdSetCameraFov(%fov) {
