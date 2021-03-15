@@ -125,7 +125,7 @@ function PlayGui::onWake(%this) {
 
 	alxSetChannelVolume(1, $pref::Audio::channelVolume1);
 	alxSetChannelVolume(2, $pref::Audio::channelVolume2);
-	
+
 	for (%i = 0; %i < %this.powerupTimersLength; %i ++) { // main_gi: Cancel all the schedules.
 		cancel(%this.powerupTimersSchedules[%i]);
 	}
@@ -481,15 +481,15 @@ function specialBarFor(%id) {
 		// 	return expandFilename("~/client/ui/game/specials/limeishexxed");
 		// }
 		// On second thought, that was a stupid idea.
-		return expandFilename("~/client/ui/game/specials/limeish");
+		return expandFilename("~/client/ui/game/specials/superbouncebar");
 	} else if (%id == 4) { // Shock Absorber
-		return expandFilename("~/client/ui/game/specials/purple");
+		return expandFilename("~/client/ui/game/specials/shockabsorberbar");
 	} else if (%id == 5) { // Gyrocopter
-		return expandFilename("~/client/ui/game/specials/gray");
+		return expandFilename("~/client/ui/game/specials/gyrocopterbar");
 	} else if (%id == 6) { // Mega Marble
-		return expandFilename("~/client/ui/game/specials/darkgreen");
+		return expandFilename("~/client/ui/game/specials/megamarblebar");
 	} else if (%id == 7) { // Teleporter
-		return expandFilename("~/client/ui/game/specials/teleporter");
+		return expandFilename("~/client/ui/game/specials/teleporterbar");
 	}
 	return expandFilename("~/client/ui/game/specials/gray");
 }
