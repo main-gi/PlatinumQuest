@@ -521,6 +521,7 @@ function PlayGui::resetTimer(%this,%dt) {
 
 	%this.stopCountdown();
 	%this.updateCountdown();
+	%this.updateTimeTravelCountdown(); // main_gi v4.2.3
 	%this.updateControls();
 	%this.stopTimer();
 }
@@ -787,6 +788,7 @@ function PlayGui::updateTimer(%this, %timeInc) {
 			%this.bonusTime = 0;
 		}
 	}
+	%this.updateTimeTravelCountdown(); // main_gi v4.2.3
 	if (!%this.stopped && !%this.bonusTime) {
 		alxStop($BonusSfx);
 		$BonusSfx = "";
@@ -807,6 +809,56 @@ function PlayGui::updateTimer(%this, %timeInc) {
 	}
 
 	%this.updateControls();
+}
+
+function clientCmdUpdateTimeTravelCountdown() {
+	// main_gi v4.2.3: By default, the color DOESN'T change to green properly if you get a TT timer during the start phase, if you end the level with a TT, or if you enter a timestop with a TT. So this function is called in /server/powerups.cs (TimeTravelItem::onPickup), /server/triggers.cs (TimeStopTrigger), /server/game.cs (endGameSetup).
+	PlayGui.updateTimeTravelCountdown();
+}
+
+function PlayGui::updateTimeTravelCountdown(%this) {
+	%timeUsed = %this.bonusTime + 99; // When you pick up a 5s timer, it should start by displaying 5.0, instead of 4.9. This also prevents the TT timer from showing 0.0. But if you add 100, picking up a 5s timer can show "5.1". Turns out adding 99 actually works perfectly here.
+	%secondsLeft = mFloor(%timeUsed/1000);
+	%tenths = mFloor(%timeUsed/100) % 10;
+
+	%one = mFloor(%secondsLeft) % 10;
+	%ten = mFloor(%secondsLeft / 10) % 10;
+	%hun = mFloor(%secondsLeft / 100);
+
+	%color = (%this.stopped || $PlayTimerActive == 0) ? $TimeColor["stopped"] : $TimeColor["normal"]; // can try $Game::TimeStoppedClients >= 1
+
+	%offsetIfThousandths = $pref::Thousandths? 5:0;
+	if (%secondsLeft < 10) {
+		PGCountdownTTFirstDigit.setNumberColor(%one, %color);
+		PGCountdownTTThirdDigitOrDecimal.setNumberColor(%tenths, %color);
+		PGCountdownTTThirdDigitOrDecimal.setPosition("397" + %offsetIfThousandths SPC "0");
+	} else if (%secondsLeft < 100) {
+		PGCountdownTTFirstDigit.setNumberColor(%ten, %color);
+		PGCountdownTTSecondDigit.setNumberColor(%one, %color);
+		PGCountdownTTThirdDigitOrDecimal.setNumberColor(%tenths, %color);
+		PGCountdownTTThirdDigitOrDecimal.setPosition("413" + %offsetIfThousandths SPC "0");
+	} else if (%secondsLeft < 999) {
+		PGCountdownTTFirstDigit.setNumberColor(%hun, %color);
+		PGCountdownTTSecondDigit.setNumberColor(%ten, %color);
+		PGCountdownTTThirdDigitOrDecimal.setNumberColor(%one, %color);
+		PGCountdownTTThirdDigitOrDecimal.setPosition("407" + %offsetIfThousandths SPC "0");
+	} else {
+		PGCountdownTTFirstDigit.setNumberColor(9, %color);
+		PGCountdownTTSecondDigit.setNumberColor(9, %color);
+		PGCountdownTTThirdDigitOrDecimal.setNumberColor(9, %color);
+		PGCountdownTTThirdDigitOrDecimal.setPosition("407" + %offsetIfThousandths SPC "0");
+	}
+	
+	PGCountdownTTImage.setPosition("348" + %offsetIfThousandths SPC "3");
+	PGCountdownTTFirstDigit.setPosition("375" + %offsetIfThousandths SPC "0");
+	PGCountdownTTSecondDigit.setPosition("391" + %offsetIfThousandths SPC "0");
+
+	PGCountdownTTPoint.setNumberColor("point", %color);
+	PGCountdownTTPoint.setVisible(!(%secondsLeft >= 100));
+	PGCountdownTTPoint.setPosition((%secondsLeft >= 10 ? "403" : "388") + %offsetIfThousandths SPC "0");
+
+	PGCountdownTTSecondDigit.setVisible(%secondsLeft >= 10);
+	PGCountdownTT.setVisible(%this.bonusTime);
 }
 
 function PlayGui::updateControls(%this) {

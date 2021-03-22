@@ -368,6 +368,8 @@ function endGameSetup() {
 	Time::stop();
 	Time::sync();
 
+	commandToAll('UpdateTimeTravelCountdown'); // main_gi v4.2.3
+
 	$Server::SpawnGroups = false;
 	$Game::State = "End";
 	// TODO: For the brand sexy new race mode, make this 1000 to have a 1 second pause
